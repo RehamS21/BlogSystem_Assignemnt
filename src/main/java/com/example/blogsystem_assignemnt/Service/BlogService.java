@@ -63,20 +63,23 @@ public class BlogService {
 
 
     public Blog getBlogById(Integer user_id, Integer blog_id){
-        Blog blog = blogRepository.getBlogUserById(user_id, blog_id);
+        Blog blog = blogRepository.findBlogById(blog_id);
 
         if (blog == null)
             throw new ApiException("No blog found with this id");
-
+        else if (blog.getUser().getId() != user_id) {
+            throw new ApiException("Sorry, you can't see this blog");
+        }
         return blog;
     }
 
     public Blog getBlogByTitle(Integer user_id,String title){
-        Blog blog = blogRepository.getBlogUserByTitle(user_id,title);
+        Blog blog = blogRepository.getBlogByTitle(title);
 
         if (blog == null)
             throw new ApiException("Sorry, can't see this blog");
-
+        else if (blog.getUser().getId() != user_id)
+            throw new ApiException("Sorry, you can't see this blog");
         return blog;
     }
 
