@@ -30,22 +30,22 @@ public class BlogController {
 
     @PutMapping("/update/{blog_id}")
     public ResponseEntity updateBlogController(@AuthenticationPrincipal User user , @PathVariable Integer blog_id , @RequestBody @Valid Blog blog){
-        blogService.updateBlog(blog_id , blog);
+        blogService.updateBlog(user.getId(), blog_id , blog);
         return ResponseEntity.status(200).body(new ApiResponse("The blog updated successfully"));
     }
     @DeleteMapping("/delete/{blog_id}")
     public ResponseEntity deleteBlogController(@AuthenticationPrincipal User user , @PathVariable Integer blog_id){
-        blogService.deleteBlog(blog_id);
+        blogService.deleteBlog(user.getId(),blog_id);
         return ResponseEntity.status(200).body(new ApiResponse("The blog deleted successfully"));
     }
 
     @GetMapping("/getById/{blog_id}")
     public ResponseEntity getBlogsByIdController(@AuthenticationPrincipal User user , @PathVariable Integer blog_id){
-        return ResponseEntity.status(200).body(blogService.getBlogById(blog_id));
+        return ResponseEntity.status(200).body(blogService.getBlogById(user.getId(), blog_id));
     }
 
     @GetMapping("/getTitle/{title}")
     public ResponseEntity getBlogByTitleController(@AuthenticationPrincipal User user , @PathVariable String title){
-        return ResponseEntity.status(200).body(blogService.getBlogByTitle(title));
+        return ResponseEntity.status(200).body(blogService.getBlogByTitle(user.getId(),title));
     }
 }

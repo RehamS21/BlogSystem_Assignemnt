@@ -16,7 +16,8 @@ public class BlogService {
     private final BlogRepository blogRepository;
     private final AuthRepository authRepository;
 
-    ////////////////////  normal CRUD  ///////////////////////
+
+//      Any one can see the blogs
     public List<Blog> getBlogs(){
         return blogRepository.findAll();
     }
@@ -32,9 +33,11 @@ public class BlogService {
        blogRepository.save(blog);
     }
 
-    public void updateBlog(Integer blog_id , Blog blog){
-        Blog oldBlog = blogRepository.findBlogById(blog_id);
+    public void updateBlog(Integer user_id,Integer blog_id , Blog blog){
+        if (blog.getUser().getId() != user_id)
+            throw new ApiException("Sorry, you can't update this blog");
 
+        Blog oldBlog = blogRepository.findBlogById(blog_id);
         if (oldBlog == null)
             throw new ApiException("Sorry the blog id is wrong");
 
@@ -44,23 +47,23 @@ public class BlogService {
         blogRepository.save(oldBlog);
     }
 
-    public void deleteBlog(Integer blog_id){
+    public void deleteBlog(Integer user_id,Integer blog_id){
+
         Blog deleteBlog = blogRepository.findBlogById(blog_id);
 
         if (deleteBlog == null)
             throw new ApiException("Sorry the blog id is wrong");
+        else if (deleteBlog.getUser().getId() != user_id) {
+            throw new ApiException("Sorry, you can't delete this blog");
+        }
 
         blogRepository.delete(deleteBlog);
 
     }
-    /////////////////////// With security ////////////////////////
-    public List<Blog> getBlogUser(Integer user_id){
-        User user = authRepository.findUserById(user_id);
-        return blogRepository.findAllByUser(user);
-    }
 
-    public Blog getBlogById(Integer blog_id){
-        Blog blog = blogRepository.findBlogById(blog_id);
+
+    public Blog getBlogById(Integer user_id, Integer blog_id){
+        Blog blog = blogRepository.getBlogUserById(user_id, blog_id);
 
         if (blog == null)
             throw new ApiException("No blog found with this id");
@@ -68,8 +71,8 @@ public class BlogService {
         return blog;
     }
 
-    public Blog getBlogByTitle(String title){
-        Blog blog = blogRepository.findBlogByTitle(title);
+    public Blog getBlogByTitle(Integer user_id,String title){
+        Blog blog = blogRepository.getBlogUserByTitle(user_id,title);
 
         if (blog == null)
             throw new ApiException("Sorry, can't see this blog");
